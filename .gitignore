@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Envs
+.env
+.venv
+venv/
+env/
+*.conda
+
+# OS/Editors
+.DS_Store
+.vscode/
+.idea/
+
+# Data (keep large/raw data out of git)
+data/raw/
+data/interim/
+data/processed/
+data/external/
+*.csv
+*.tsv
+*.parquet
+*.xlsx
+*.json
