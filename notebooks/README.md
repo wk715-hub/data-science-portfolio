@@ -21,6 +21,32 @@ This system predicts broker classifications for the following month using a thre
 
 ## Files
 
+### 00_data_check.ipynb ⭐ START HERE
+**Purpose**: Validate and clean your Excel data before training
+
+**What it does**:
+1. Checks how percentages are stored in your Excel file
+2. Removes '%' symbols from percentage columns
+3. Converts all percentage data to proper numeric format
+4. Validates data quality (missing values, duplicates, etc.)
+5. Checks for extreme values (explains why 900% is OK!)
+6. Saves cleaned data ready for model training
+
+**When to run**:
+- FIRST TIME: Before training any models
+- MONTHLY: When you get new data with formulas
+- ANYTIME: If you update your Excel file
+
+**Outputs**:
+- Cleaned data in `../data/interim/cleaned_broker_data.xlsx`
+- Validation report showing any issues found
+- Confirmation that data is ready for modeling
+
+### 00_validate_data.py
+**Purpose**: Python script version of data validation (alternative to notebook)
+
+Can be run from command line if you prefer scripts over notebooks.
+
 ### 01_broker_classification_pipeline.ipynb
 **Purpose**: Train the three-stage classification models
 
@@ -73,10 +99,31 @@ conda activate ds-portfolio
 jupyter lab
 ```
 
-### 2. Train Models (First Time)
+### 2. Validate and Clean Your Data (IMPORTANT - Run First!)
+
+**Why this step matters:** Excel percentages and formulas can cause issues. This step ensures Python reads your data correctly.
 
 1. Place your historical data (6+ months) in `../data/raw/Master_One_Sheet.xlsx`
-2. Open `01_broker_classification_pipeline.ipynb`
+2. Open `00_data_check.ipynb`
+3. Run all cells to:
+   - Check how percentages are stored
+   - Remove any '%' symbols
+   - Validate data quality
+   - Save a clean version
+
+**Note about high percentages (900%, etc.):**
+- This is NORMAL and expected in business metrics!
+- Machine learning models handle these perfectly
+- The models care about relationships, not absolute scale
+- Don't worry if you see percentages >100%
+
+### 3. Train Models
+
+1. Open `01_broker_classification_pipeline.ipynb`
+2. Update the file path to use the cleaned data:
+   ```python
+   df = pd.read_excel('../data/interim/cleaned_broker_data.xlsx')
+   ```
 3. Run all cells
 4. Check that accuracy targets are met:
    - Stage 1: ≥ 90%
@@ -148,6 +195,34 @@ After each month, compare predictions with actual results:
 - Ensure new data has same columns as training data
 - Check for typos in column names
 - Verify data format matches training data
+
+### Percentages not reading correctly
+**SOLUTION:** Run `00_data_check.ipynb` first!
+
+**Why this happens:**
+- Excel stores percentages in different ways (formulas vs values)
+- When you copy from Excel, the underlying format matters
+- Python may read "45%" as text instead of number
+
+**The fix:**
+1. Run the data check notebook
+2. It automatically detects and cleans percentage columns
+3. Use the cleaned data for training
+
+### "My percentages are huge (900%)! Is this a problem?"
+**NO - this is completely normal!**
+
+**Why high percentages are OK:**
+- Business metrics can legitimately exceed 100% (growth rates, ratios, etc.)
+- Machine learning models care about **relationships** between features
+- Tree-based models (Random Forest, Gradient Boosting) are **scale-invariant**
+- Whether a value is 900 or 9.0 doesn't matter - the ranking stays the same
+- The models make decisions like "is this value higher or lower than X?"
+
+**What matters:**
+- That percentages are stored as numbers (not text)
+- That the relationships between brokers are preserved
+- That features are consistent across all months
 
 ### Low accuracy
 - Check for data quality issues
